@@ -24,14 +24,34 @@
       border-radius: 5px;
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
+    input[type="text"] {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      color: #fff;
+      background-color: #007BFF;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #response {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
   </style>
+  
 </head>
 <body>
-  <form id="chat-form">
-    <input type="text" id="message" placeholder="Type your message here">
+  <form action="http://localhost:3000/chatbot" method="post">
+    <input type="text" name="message" placeholder="Type your message here">
     <input type="submit" value="Send">
   </form>
   <div id="response"></div>
-  <script src="client.js"></script>
 </body>
 </html>
