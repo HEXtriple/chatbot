@@ -31,10 +31,14 @@ const server = http.createServer((req, res) => {
       const question = post.message;
       db.query('SELECT response FROM messages WHERE question = ?', [question], (error, results, fields) => {
         if (error) throw error;
-        res.end(results[0].response);
+        if (results.length > 0) {
+          res.end(results[0].response);
+        } else {
+          res.end('No matching response found in the database.');
+        }
       });
     });
   }
 });
 
-server.listen(3000); //Standarport är redan använd av något annat program, därför väljer vi 3000 istället
+server.listen(3000);
