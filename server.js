@@ -41,7 +41,7 @@ app.post('/chatbot', (req, res) => {
       if (results.length > 0) {
         res.json(results[0].response);
       } else {
-        res.json({response: 'No matching response found in the database.'});
+        res.json('Va? Jag förstår inte vad du menar, kan du formulera dig som en sund människa?');
       }
     });
   });
