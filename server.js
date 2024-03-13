@@ -1,12 +1,15 @@
-// Importera nödvändiga moduler
-var http = require('http');
-var url = require('url');
-var mysql = require('mysql');
-var querystring = require('querystring');
+const express = require('express');
+const mysql = require('mysql');
+const querystring = require('querystring');
+const path = require('path');
+
+const app = express();
+const port = 3000;
+app.use(express.static(path.join(__dirname, 'index.html')));
 
 // Skapa en anslutning till MySQL-databasen
 // verkligen inte säkert
-const db = mysql.createConnection({
+const con = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
@@ -14,31 +17,36 @@ const db = mysql.createConnection({
   port: 3306
 });
 
-// Anslut till databasen
-db.connect();
-
-// Skapa en HTTP-server
-const server = http.createServer((req, res) => {
-  // Om förfrågan är en POST-förfrågan och sökvägen är '/chatbot'
-  if (req.method === 'POST' && url.parse(req.url).pathname === '/chatbot') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    // Här tar servern emot data från förfrågan, sql databasen chatbot med tabellen messages
-    req.on('end', () => {
-      const post = querystring.parse(body);
-      const question = post.message;
-      db.query('SELECT response FROM messages WHERE question = ?', [question], (error, results, fields) => {
-        if (error) throw error;
-        if (results.length > 0) {
-          res.end(results[0].response);
-        } else {
-          res.end('No matching response found in the database.');
-        }
-      });
-    });
-  }
+con.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to the database');
 });
 
-server.listen(3000);
+//post html filen på port 3000
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.post('/chatbot', (req, res) => {
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk.toString();
+  });
+  // Här tar servern emot data från förfrågan, sql databasen chatbot med tabellen messages
+  req.on('end', () => {
+    const post = querystring.parse(body);
+    const question = post.message;
+    con.query('SELECT response FROM messages WHERE question = ?', [question], (error, results, fields) => {
+      if (error) throw error;
+      if (results.length > 0) {
+        res.json(results[0].response);
+      } else {
+        res.json({response: 'No matching response found in the database.'});
+      }
+    });
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
